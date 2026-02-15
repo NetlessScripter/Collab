@@ -1,504 +1,240 @@
--- PERFECT PARTICLE CLONE SCRIPT - ZERO LOCAL VARIABLES
-_G.PFX=_G.PFX or {}
-_G.PFX.p=game:GetService("Players")
-_G.PFX.lp=_G.PFX.p.LocalPlayer
-_G.PFX.c=_G.PFX.lp.Character or _G.PFX.lp.CharacterAdded:Wait()
-_G.PFX.hrp=_G.PFX.c:WaitForChild("HumanoidRootPart")
+local Debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = game.Players.LocalPlayer
 
--- Create holder part
-_G.PFX.f=Instance.new("Part")
-_G.PFX.f.Name="PERFECT_PARTICLE_CLONE"
-_G.PFX.f.Anchored=true
-_G.PFX.f.CanCollide=false
-_G.PFX.f.CanQuery=false
-_G.PFX.f.CanTouch=false
-_G.PFX.f.Transparency=1
-_G.PFX.f.Size=Vector3.new(1,1,1)
-_G.PFX.f.CFrame=_G.PFX.hrp.CFrame*CFrame.new(0,0,-3)
-_G.PFX.f.Parent=workspace
+if not workspace:FindFirstChild("Effects") then
+	local effectsFolder = Instance.new("Folder")
+	effectsFolder.Name = "Effects"
+	effectsFolder.Parent = workspace
+end
 
--- Storage tables
-_G.PFX.att={}
-_G.PFX.emit={}
+local function BlackFlashHit(attacker, victim)
+	if not attacker:FindFirstChild("HumanoidRootPart") then return end
+	
+	local victimHRP = victim:FindFirstChild("HumanoidRootPart")
+	if not victimHRP then return end
+	
+	local effectPart = Instance.new("Part")
+	effectPart.Name = "BlackFlashHit"
+	effectPart.Anchored = true
+	effectPart.CanCollide = false
+	effectPart.CanQuery = false
+	effectPart.CanTouch = false
+	effectPart.Transparency = 1
+	effectPart.Size = Vector3.new(1, 1, 1)
+	effectPart.Position = victimHRP.Position
+	effectPart.Parent = workspace.Effects
+	Debris:AddItem(effectPart, 1)
+	
+	local pointLight = Instance.new("PointLight", effectPart)
+	pointLight.Brightness = 10
+	pointLight.Color = Color3.fromRGB(255, 0, 0)
+	pointLight.Range = 30
+	
+	local spotLight = Instance.new("SpotLight", effectPart)
+	spotLight.Brightness = 15
+	spotLight.Color = Color3.fromRGB(255, 0, 0)
+	spotLight.Range = 50
+	spotLight.Angle = 90
+	spotLight.Face = Enum.NormalId.Front
+	
+	local att1 = Instance.new('Attachment', effectPart)
+	local wind2 = Instance.new('ParticleEmitter', att1)
+	wind2.Name = "Wind2"
+	wind2.Brightness = 5
+	wind2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1, 0, 0)), ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))})
+	wind2.LightEmission = 1
+	wind2.LightInfluence = 0
+	wind2.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+	wind2.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 40, 0), NumberSequenceKeypoint.new(1, 40, 0)})
+	wind2.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0, -3, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	wind2.Texture = "rbxassetid://1053548563"
+	wind2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 1, 0)})
+	wind2.ZOffset = 0
+	wind2.EmissionDirection = Enum.NormalId.Top
+	wind2.Enabled = false
+	wind2.Lifetime = NumberRange.new(0.1, 0.1)
+	wind2.Rate = 100
+	wind2.RotSpeed = NumberRange.new(0, 0)
+	wind2.Rotation = NumberRange.new(-360, 360)
+	wind2.Speed = NumberRange.new(0.01, 0.01)
+	wind2.SpreadAngle = Vector2.new(360, 360)
+	wind2.TimeScale = 1
+	wind2.Acceleration = Vector3.new(0, 0, 0)
+	wind2.Drag = 0
+	wind2.VelocityInheritance = 0
+	wind2.WindAffectsDrag = false
+	wind2.Shape = Enum.ParticleEmitterShape.Box
+	wind2.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	wind2.ShapePartial = 1
+	wind2.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	wind2.LockedToPart = false
+	
+	local att2 = Instance.new('Attachment', effectPart)
+	local blast = Instance.new('ParticleEmitter', att2)
+	blast.Name = "Blast"
+	blast.Brightness = 1
+	blast.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1, 0, 0)), ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))})
+	blast.LightEmission = 1
+	blast.LightInfluence = 1
+	blast.Orientation = Enum.ParticleOrientation.VelocityParallel
+	blast.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 10, 0), NumberSequenceKeypoint.new(1, 38.029678344726562, 0)})
+	blast.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0, -3, 0), NumberSequenceKeypoint.new(1, 2.5124998092651367, 0)})
+	blast.Texture = "rbxassetid://7994629137"
+	blast.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	blast.ZOffset = 0
+	blast.EmissionDirection = Enum.NormalId.Front
+	blast.Enabled = false
+	blast.Lifetime = NumberRange.new(0.1, 0.1)
+	blast.Rate = 100
+	blast.RotSpeed = NumberRange.new(0, 0)
+	blast.Rotation = NumberRange.new(-360, 360)
+	blast.Speed = NumberRange.new(0.1, 0.1)
+	blast.SpreadAngle = Vector2.new(360, 360)
+	blast.TimeScale = 1
+	blast.Acceleration = Vector3.new(0, 0, 0)
+	blast.Drag = 0
+	blast.VelocityInheritance = 0
+	blast.WindAffectsDrag = false
+	blast.Shape = Enum.ParticleEmitterShape.Box
+	blast.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	blast.ShapePartial = 1
+	blast.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	blast.LockedToPart = false
+	
+	local att3 = Instance.new('Attachment', effectPart)
+	local sparks = Instance.new('ParticleEmitter', att3)
+	sparks.Name = "Sparks"
+	sparks.Brightness = 15
+	sparks.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1, 0, 0)), ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))})
+	sparks.LightEmission = 0
+	sparks.LightInfluence = 0
+	sparks.Orientation = Enum.ParticleOrientation.VelocityParallel
+	sparks.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 2, 1), NumberSequenceKeypoint.new(1, 0, 0)})
+	sparks.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(0.3, 3, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	sparks.Texture = "rbxassetid://15407518755"
+	sparks.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	sparks.ZOffset = 0
+	sparks.EmissionDirection = Enum.NormalId.Front
+	sparks.Enabled = false
+	sparks.Lifetime = NumberRange.new(0.3, 0.45)
+	sparks.Rate = 100
+	sparks.RotSpeed = NumberRange.new(0, 0)
+	sparks.Rotation = NumberRange.new(90, 90)
+	sparks.Speed = NumberRange.new(40, 150)
+	sparks.SpreadAngle = Vector2.new(360, 360)
+	sparks.TimeScale = 1
+	sparks.Acceleration = Vector3.new(0, 0, 0)
+	sparks.Drag = 10
+	sparks.VelocityInheritance = 0
+	sparks.WindAffectsDrag = false
+	sparks.Shape = Enum.ParticleEmitterShape.Box
+	sparks.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	sparks.ShapePartial = 1
+	sparks.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	sparks.LockedToPart = false
+	
+	local att4 = Instance.new('Attachment', effectPart)
+	local lightning = Instance.new('ParticleEmitter', att4)
+	lightning.Name = "Lightning"
+	lightning.Brightness = 5
+	lightning.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1, 0, 0)), ColorSequenceKeypoint.new(1, Color3.new(1, 0, 0))})
+	lightning.LightEmission = 0
+	lightning.LightInfluence = 0
+	lightning.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+	lightning.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(0.1, 8.66, 0), NumberSequenceKeypoint.new(0.37, 9.52, 0), NumberSequenceKeypoint.new(1, 10, 0)})
+	lightning.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	lightning.Texture = "rbxassetid://14255829980"
+	lightning.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	lightning.ZOffset = 2
+	lightning.EmissionDirection = Enum.NormalId.Top
+	lightning.Enabled = false
+	lightning.Lifetime = NumberRange.new(0.2, 0.8)
+	lightning.Rate = 100
+	lightning.RotSpeed = NumberRange.new(0, 0)
+	lightning.Rotation = NumberRange.new(0, 360)
+	lightning.Speed = NumberRange.new(0.001, 10)
+	lightning.SpreadAngle = Vector2.new(360, 360)
+	lightning.TimeScale = 1
+	lightning.Acceleration = Vector3.new(0, 0, 0)
+	lightning.Drag = 3
+	lightning.VelocityInheritance = 0
+	lightning.WindAffectsDrag = false
+	lightning.Shape = Enum.ParticleEmitterShape.Box
+	lightning.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	lightning.ShapePartial = 1
+	lightning.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	lightning.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
+	lightning.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
+	lightning.LockedToPart = true
+	
+	local att5 = Instance.new('Attachment', effectPart)
+	local wind = Instance.new('ParticleEmitter', att5)
+	wind.Name = "Wind"
+	wind.Brightness = 5
+	wind.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)), ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))})
+	wind.LightEmission = 0
+	wind.LightInfluence = 0
+	wind.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+	wind.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 6.327, 0), NumberSequenceKeypoint.new(0.11, 13.74, 0), NumberSequenceKeypoint.new(0.38, 18.83, 0), NumberSequenceKeypoint.new(1, 21.82, 0)})
+	wind.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0, 0, 0), NumberSequenceKeypoint.new(1, 0, 0)})
+	wind.Texture = "rbxassetid://7216847656"
+	wind.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.85, 0), NumberSequenceKeypoint.new(1, 1, 0)})
+	wind.ZOffset = 0
+	wind.EmissionDirection = Enum.NormalId.Top
+	wind.Enabled = false
+	wind.Lifetime = NumberRange.new(0.2, 0.6)
+	wind.Rate = 100
+	wind.RotSpeed = NumberRange.new(750, 750)
+	wind.Rotation = NumberRange.new(-360, 360)
+	wind.Speed = NumberRange.new(0.01, 0.01)
+	wind.SpreadAngle = Vector2.new(360, 360)
+	wind.TimeScale = 1
+	wind.Acceleration = Vector3.new(0, 0, 0)
+	wind.Drag = 0
+	wind.VelocityInheritance = 0
+	wind.WindAffectsDrag = false
+	wind.Shape = Enum.ParticleEmitterShape.Box
+	wind.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	wind.ShapePartial = 1
+	wind.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	wind.LockedToPart = true
+	
+	wind2:Emit(8)
+	
+	TweenService:Create(pointLight, TweenInfo.new(1), {
+		Brightness = 0;
+	}):Play()
+	
+	TweenService:Create(spotLight, TweenInfo.new(1), {
+		Brightness = 0;
+	}):Play()
+	
+	task.delay(0.1, function()
+		blast:Emit(8)
+		sparks:Emit(15)
+		lightning:Emit(6)
+		wind:Emit(7)
+	end)
+	
+	if LocalPlayer.Character == attacker or LocalPlayer.Character == victim then
+		local colorCorrection = Instance.new("ColorCorrectionEffect")
+		colorCorrection.Name = "BlackFlashCC"
+		colorCorrection.Brightness = -200
+		colorCorrection.Contrast = 1000
+		colorCorrection.Saturation = -1
+		colorCorrection.TintColor = Color3.fromRGB(255, 0, 0)
+		colorCorrection.Enabled = true
+		colorCorrection.Parent = game.Lighting
+		
+		task.wait(0.04)
+		colorCorrection.TintColor = Color3.new(1, 1, 1)
+		task.wait(0.04)
+		colorCorrection.Brightness = 200
+		colorCorrection.Contrast = -1000
+		task.wait(0.04)
+		colorCorrection:Destroy()
+	end
+end
 
--- Emitter 1: Sparks
-_G.PFX.att[1]=Instance.new('Attachment')
-_G.PFX.att[1].Name="Core"
-_G.PFX.att[1].Axis=Vector3.new(1,0,0)
-_G.PFX.att[1].CFrame=CFrame.new(0,-1,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[1].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[1].Position=Vector3.new(0,-1,0)
-_G.PFX.att[1].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[1].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[1].Visible=false
-_G.PFX.att[1].Parent=_G.PFX.f
-
-_G.PFX.emit[1]=Instance.new('ParticleEmitter')
-_G.PFX.emit[1].Name="Sparks"
-_G.PFX.emit[1].Brightness=5
-_G.PFX.emit[1].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.66666668653488159,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.66666668653488159,1))})
-_G.PFX.emit[1].LightEmission=-5
-_G.PFX.emit[1].LightInfluence=0
-_G.PFX.emit[1].Orientation=Enum.ParticleOrientation.FacingCamera
-_G.PFX.emit[1].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,1,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[1].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[1].Texture="rbxassetid://15269497616"
-_G.PFX.emit[1].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[1].ZOffset=0
-_G.PFX.emit[1].EmissionDirection=Enum.NormalId.Front
-_G.PFX.emit[1].Enabled=true
-_G.PFX.emit[1].Lifetime=NumberRange.new(0.40000000596046448,0.60000002384185791)
-_G.PFX.emit[1].Rate=50
-_G.PFX.emit[1].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[1].Rotation=NumberRange.new(-360,360)
-_G.PFX.emit[1].Speed=NumberRange.new(0,2)
-_G.PFX.emit[1].SpreadAngle=Vector2.new(360,360)
-_G.PFX.emit[1].TimeScale=1
-_G.PFX.emit[1].Acceleration=Vector3.new(0,10,0)
-_G.PFX.emit[1].Drag=0
-_G.PFX.emit[1].VelocityInheritance=0.20000000298023224
-_G.PFX.emit[1].WindAffectsDrag=false
-_G.PFX.emit[1].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[1].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[1].ShapePartial=1
-_G.PFX.emit[1].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[1].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[1].FlipbookLayout=Enum.ParticleFlipbookLayout.Grid4x4
-_G.PFX.emit[1].FlipbookMode=Enum.ParticleFlipbookMode.OneShot
-_G.PFX.emit[1].FlipbookStartRandom=true
-_G.PFX.emit[1].LockedToPart=false
-_G.PFX.emit[1].Parent=_G.PFX.att[1]
-_G.PFX.emit[1]:Emit(15)
-
--- Emitter 2: Aura
-_G.PFX.att[2]=Instance.new('Attachment')
-_G.PFX.att[2].Name="Core"
-_G.PFX.att[2].Axis=Vector3.new(1,0,0)
-_G.PFX.att[2].CFrame=CFrame.new(0,-1,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[2].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[2].Position=Vector3.new(0,-1,0)
-_G.PFX.att[2].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[2].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[2].Visible=false
-_G.PFX.att[2].Parent=_G.PFX.f
-
-_G.PFX.emit[2]=Instance.new('ParticleEmitter')
-_G.PFX.emit[2].Name="Aura"
-_G.PFX.emit[2].Brightness=5
-_G.PFX.emit[2].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.66666668653488159,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.66666668653488159,1))})
-_G.PFX.emit[2].LightEmission=-5
-_G.PFX.emit[2].LightInfluence=0
-_G.PFX.emit[2].Orientation=Enum.ParticleOrientation.FacingCamera
-_G.PFX.emit[2].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,1.3486003875732422,0.69999998807907104),NumberSequenceKeypoint.new(0.36042943596839905,1.2468194961547852,0.50460124015808105),NumberSequenceKeypoint.new(0.70552146434783936,1.0178118944168091,0.35370376706123352),NumberSequenceKeypoint.new(0.86809813976287842,0.63613235950469971,0.2178070992231369),NumberSequenceKeypoint.new(1,0.38167953491210938,0)})
-_G.PFX.emit[2].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[2].Texture="rbxassetid://9285330517"
-_G.PFX.emit[2].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[2].ZOffset=1.5
-_G.PFX.emit[2].EmissionDirection=Enum.NormalId.Front
-_G.PFX.emit[2].Enabled=true
-_G.PFX.emit[2].Lifetime=NumberRange.new(0.40000000596046448,0.60000002384185791)
-_G.PFX.emit[2].Rate=15
-_G.PFX.emit[2].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[2].Rotation=NumberRange.new(-360,360)
-_G.PFX.emit[2].Speed=NumberRange.new(0,2)
-_G.PFX.emit[2].SpreadAngle=Vector2.new(360,360)
-_G.PFX.emit[2].TimeScale=1
-_G.PFX.emit[2].Acceleration=Vector3.new(0,15,0)
-_G.PFX.emit[2].Drag=0
-_G.PFX.emit[2].VelocityInheritance=0
-_G.PFX.emit[2].WindAffectsDrag=false
-_G.PFX.emit[2].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[2].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[2].ShapePartial=1
-_G.PFX.emit[2].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[2].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[2].FlipbookLayout=Enum.ParticleFlipbookLayout.Grid4x4
-_G.PFX.emit[2].FlipbookMode=Enum.ParticleFlipbookMode.OneShot
-_G.PFX.emit[2].FlipbookStartRandom=false
-_G.PFX.emit[2].LockedToPart=true
-_G.PFX.emit[2].Parent=_G.PFX.att[2]
-_G.PFX.emit[2]:Emit(15)
-
-game:GetService('Debris'):AddItem(_G.PFX.f,20)
-task.delay(.5,function() _G.PFX={} end)
-wait(.4)
--- PERFECT PARTICLE CLONE SCRIPT - ZERO LOCAL VARIABLES
-_G.PFX=_G.PFX or {}
-_G.PFX.p=game:GetService("Players")
-_G.PFX.lp=_G.PFX.p.LocalPlayer
-_G.PFX.c=_G.PFX.lp.Character or _G.PFX.lp.CharacterAdded:Wait()
-_G.PFX.hrp=_G.PFX.c:WaitForChild("HumanoidRootPart")
-
--- Create holder part
-_G.PFX.f=Instance.new("Part")
-_G.PFX.f.Name="PERFECT_PARTICLE_CLONE"
-_G.PFX.f.Anchored=true
-_G.PFX.f.CanCollide=false
-_G.PFX.f.CanQuery=false
-_G.PFX.f.CanTouch=false
-_G.PFX.f.Transparency=1
-_G.PFX.f.Size=Vector3.new(1,1,1)
-_G.PFX.f.CFrame=_G.PFX.hrp.CFrame*CFrame.new(0,0,-3)
-_G.PFX.f.Parent=workspace
-
--- Storage tables
-_G.PFX.att={}
-_G.PFX.emit={}
-
--- Emitter 1: Final
-_G.PFX.att[1]=Instance.new('Attachment')
-_G.PFX.att[1].Name="Final"
-_G.PFX.att[1].Axis=Vector3.new(1,0,0)
-_G.PFX.att[1].CFrame=CFrame.new(0,0,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[1].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[1].Position=Vector3.new(0,0,0)
-_G.PFX.att[1].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[1].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[1].Visible=false
-_G.PFX.att[1].Parent=_G.PFX.f
-
-_G.PFX.emit[1]=Instance.new('ParticleEmitter')
-_G.PFX.emit[1].Name="Final"
-_G.PFX.emit[1].Brightness=5
-_G.PFX.emit[1].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.66666668653488159,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.66666668653488159,1))})
-_G.PFX.emit[1].LightEmission=-10
-_G.PFX.emit[1].LightInfluence=0
-_G.PFX.emit[1].Orientation=Enum.ParticleOrientation.VelocityParallel
-_G.PFX.emit[1].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,2.8879308700561523,0),NumberSequenceKeypoint.new(0.14214465022087097,6.9827585220336914,0),NumberSequenceKeypoint.new(0.30299252271652222,1.25,0),NumberSequenceKeypoint.new(0.46009975671768188,3.6206893920898438,0),NumberSequenceKeypoint.new(0.62219452857971191,2.3275864124298096,0),NumberSequenceKeypoint.new(0.77680802345275879,1.4655172824859619,0),NumberSequenceKeypoint.new(0.89152121543884277,2.5431036949157715,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[1].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,-2.2588238716125488,0),NumberSequenceKeypoint.new(0.19440124928951263,-0.74117660522460938,0),NumberSequenceKeypoint.new(1,1.2705879211425781,0)})
-_G.PFX.emit[1].Texture="rbxassetid://6660412891"
-_G.PFX.emit[1].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(0.55774456262588501,0.18208956718444824,0),NumberSequenceKeypoint.new(0.89402174949645996,0.87164175510406494,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[1].ZOffset=-1
-_G.PFX.emit[1].EmissionDirection=Enum.NormalId.Top
-_G.PFX.emit[1].Enabled=false
-_G.PFX.emit[1].Lifetime=NumberRange.new(0.10000000149011612,0.10000000149011612)
-_G.PFX.emit[1].Rate=200
-_G.PFX.emit[1].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[1].Rotation=NumberRange.new(90,90)
-_G.PFX.emit[1].Speed=NumberRange.new(10,20)
-_G.PFX.emit[1].SpreadAngle=Vector2.new(180,-180)
-_G.PFX.emit[1].TimeScale=1
-_G.PFX.emit[1].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[1].Drag=5
-_G.PFX.emit[1].VelocityInheritance=0
-_G.PFX.emit[1].WindAffectsDrag=false
-_G.PFX.emit[1].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[1].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[1].ShapePartial=1
-_G.PFX.emit[1].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[1].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[1].FlipbookLayout=Enum.ParticleFlipbookLayout.None
-_G.PFX.emit[1].FlipbookMode=Enum.ParticleFlipbookMode.Loop
-_G.PFX.emit[1].FlipbookStartRandom=false
-_G.PFX.emit[1].LockedToPart=true
-_G.PFX.emit[1].Parent=_G.PFX.att[1]
-_G.PFX.emit[1]:Emit(15)
-
--- Emitter 2: Flare
-_G.PFX.att[2]=Instance.new('Attachment')
-_G.PFX.att[2].Name="Final"
-_G.PFX.att[2].Axis=Vector3.new(1,0,0)
-_G.PFX.att[2].CFrame=CFrame.new(0,0,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[2].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[2].Position=Vector3.new(0,0,0)
-_G.PFX.att[2].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[2].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[2].Visible=false
-_G.PFX.att[2].Parent=_G.PFX.f
-
-_G.PFX.emit[2]=Instance.new('ParticleEmitter')
-_G.PFX.emit[2].Name="Flare"
-_G.PFX.emit[2].Brightness=5
-_G.PFX.emit[2].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.66666668653488159,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.66666668653488159,1))})
-_G.PFX.emit[2].LightEmission=0
-_G.PFX.emit[2].LightInfluence=0
-_G.PFX.emit[2].Orientation=Enum.ParticleOrientation.FacingCamera
-_G.PFX.emit[2].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,10,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[2].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,2.9543681144714355,0),NumberSequenceKeypoint.new(0.29081401228904724,-5.6338777542114258,0),NumberSequenceKeypoint.new(0.55481404066085815,-9.3594827651977539,0),NumberSequenceKeypoint.new(1,-11.560976982116699,0)})
-_G.PFX.emit[2].Texture="http://www.roblox.com/asset/?id=5192965045"
-_G.PFX.emit[2].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(0.69999998807907104,0,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[2].ZOffset=3
-_G.PFX.emit[2].EmissionDirection=Enum.NormalId.Top
-_G.PFX.emit[2].Enabled=false
-_G.PFX.emit[2].Lifetime=NumberRange.new(1,1)
-_G.PFX.emit[2].Rate=20
-_G.PFX.emit[2].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[2].Rotation=NumberRange.new(0,0)
-_G.PFX.emit[2].Speed=NumberRange.new(0,0)
-_G.PFX.emit[2].SpreadAngle=Vector2.new(0,0)
-_G.PFX.emit[2].TimeScale=1
-_G.PFX.emit[2].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[2].Drag=0
-_G.PFX.emit[2].VelocityInheritance=0
-_G.PFX.emit[2].WindAffectsDrag=false
-_G.PFX.emit[2].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[2].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[2].ShapePartial=1
-_G.PFX.emit[2].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[2].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[2].FlipbookLayout=Enum.ParticleFlipbookLayout.None
-_G.PFX.emit[2].FlipbookMode=Enum.ParticleFlipbookMode.Loop
-_G.PFX.emit[2].FlipbookStartRandom=false
-_G.PFX.emit[2].LockedToPart=true
-_G.PFX.emit[2].Parent=_G.PFX.att[2]
-_G.PFX.emit[2]:Emit(15)
-
--- Emitter 3: Wind2
-_G.PFX.att[3]=Instance.new('Attachment')
-_G.PFX.att[3].Name="Final"
-_G.PFX.att[3].Axis=Vector3.new(1,0,0)
-_G.PFX.att[3].CFrame=CFrame.new(0,0,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[3].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[3].Position=Vector3.new(0,0,0)
-_G.PFX.att[3].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[3].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[3].Visible=false
-_G.PFX.att[3].Parent=_G.PFX.f
-
-_G.PFX.emit[3]=Instance.new('ParticleEmitter')
-_G.PFX.emit[3].Name="Wind2"
-_G.PFX.emit[3].Brightness=2
-_G.PFX.emit[3].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(0.3333333432674408,0.66666668653488159,1)),ColorSequenceKeypoint.new(1,Color3.new(0.3333333432674408,0.66666668653488159,1))})
-_G.PFX.emit[3].LightEmission=1
-_G.PFX.emit[3].LightInfluence=0
-_G.PFX.emit[3].Orientation=Enum.ParticleOrientation.VelocityPerpendicular
-_G.PFX.emit[3].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,40,0),NumberSequenceKeypoint.new(1,40,0)})
-_G.PFX.emit[3].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,-3,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[3].Texture="rbxassetid://1053548563"
-_G.PFX.emit[3].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[3].ZOffset=0
-_G.PFX.emit[3].EmissionDirection=Enum.NormalId.Top
-_G.PFX.emit[3].Enabled=false
-_G.PFX.emit[3].Lifetime=NumberRange.new(0.10000000149011612,0.10000000149011612)
-_G.PFX.emit[3].Rate=100
-_G.PFX.emit[3].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[3].Rotation=NumberRange.new(-360,360)
-_G.PFX.emit[3].Speed=NumberRange.new(0.0099999997764825821,0.0099999997764825821)
-_G.PFX.emit[3].SpreadAngle=Vector2.new(360,360)
-_G.PFX.emit[3].TimeScale=1
-_G.PFX.emit[3].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[3].Drag=0
-_G.PFX.emit[3].VelocityInheritance=0
-_G.PFX.emit[3].WindAffectsDrag=false
-_G.PFX.emit[3].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[3].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[3].ShapePartial=1
-_G.PFX.emit[3].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[3].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[3].FlipbookLayout=Enum.ParticleFlipbookLayout.None
-_G.PFX.emit[3].FlipbookMode=Enum.ParticleFlipbookMode.Loop
-_G.PFX.emit[3].FlipbookStartRandom=false
-_G.PFX.emit[3].LockedToPart=false
-_G.PFX.emit[3].Parent=_G.PFX.att[3]
-_G.PFX.emit[3]:Emit(15)
-
--- Emitter 4: Hit
-_G.PFX.att[4]=Instance.new('Attachment')
-_G.PFX.att[4].Name="Final"
-_G.PFX.att[4].Axis=Vector3.new(1,0,0)
-_G.PFX.att[4].CFrame=CFrame.new(0,0,0,1,0,0,0,1,0,0,0,1)
-_G.PFX.att[4].Orientation=Vector3.new(-0,0,0)
-_G.PFX.att[4].Position=Vector3.new(0,0,0)
-_G.PFX.att[4].Rotation=Vector3.new(-0,0,-0)
-_G.PFX.att[4].SecondaryAxis=Vector3.new(0,1,0)
-_G.PFX.att[4].Visible=false
-_G.PFX.att[4].Parent=_G.PFX.f
-
-_G.PFX.emit[4]=Instance.new('ParticleEmitter')
-_G.PFX.emit[4].Name="Hit"
-_G.PFX.emit[4].Brightness=15
-_G.PFX.emit[4].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(1,0,0)),ColorSequenceKeypoint.new(1,Color3.new(1,0,0))})
-_G.PFX.emit[4].LightEmission=-15
-_G.PFX.emit[4].LightInfluence=0
-_G.PFX.emit[4].Orientation=Enum.ParticleOrientation.VelocityParallel
-_G.PFX.emit[4].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,0,1.0868631601333618),NumberSequenceKeypoint.new(0.10000000149011612,7.8903160095214844,1.0868631601333618),NumberSequenceKeypoint.new(0.20000000298023224,10.127310752868652,1.0868631601333618),NumberSequenceKeypoint.new(0.30000001192092896,11.444904327392578,1.0868631601333618),NumberSequenceKeypoint.new(0.40000000596046448,12.294052124023438,1.0868631601333618),NumberSequenceKeypoint.new(0.5,12.851029396057129,1.0868631601333618),NumberSequenceKeypoint.new(0.60000002384185791,13.208165168762207,1.0868631601333618),NumberSequenceKeypoint.new(0.69999998807907104,13.422731399536133,1.0868631601333618),NumberSequenceKeypoint.new(0.80000001192092896,13.535344123840332,1.0868631601333618),NumberSequenceKeypoint.new(0.89999997615814209,13.579056739807129,1.0868631601333618),NumberSequenceKeypoint.new(1,13.585786819458008,1.0868631601333618)})
-_G.PFX.emit[4].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[4].Texture="http://www.roblox.com/asset/?id=16803107330"
-_G.PFX.emit[4].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,0,0)})
-_G.PFX.emit[4].ZOffset=0
-_G.PFX.emit[4].EmissionDirection=Enum.NormalId.Front
-_G.PFX.emit[4].Enabled=false
-_G.PFX.emit[4].Lifetime=NumberRange.new(0.05000000074505806,0.20000000298023224)
-_G.PFX.emit[4].Rate=5
-_G.PFX.emit[4].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[4].Rotation=NumberRange.new(-360,360)
-_G.PFX.emit[4].Speed=NumberRange.new(0.02601933479309082,0.02601933479309082)
-_G.PFX.emit[4].SpreadAngle=Vector2.new(360,-360)
-_G.PFX.emit[4].TimeScale=1
-_G.PFX.emit[4].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[4].Drag=0
-_G.PFX.emit[4].VelocityInheritance=0
-_G.PFX.emit[4].WindAffectsDrag=false
-_G.PFX.emit[4].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[4].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[4].ShapePartial=1
-_G.PFX.emit[4].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[4].FlipbookFramerate=NumberRange.new(41,66)
-_G.PFX.emit[4].FlipbookLayout=Enum.ParticleFlipbookLayout.Grid4x4
-_G.PFX.emit[4].FlipbookMode=Enum.ParticleFlipbookMode.OneShot
-_G.PFX.emit[4].FlipbookStartRandom=false
-_G.PFX.emit[4].LockedToPart=false
-_G.PFX.emit[4].Parent=_G.PFX.att[4]
-_G.PFX.emit[4]:Emit(15)
-
-game:GetService('Debris'):AddItem(_G.PFX.f,20)
-task.delay(.3,function() _G.PFX={} end)
-wait(.5)
--- PERFECT PARTICLE CLONE SCRIPT - ZERO LOCAL VARIABLES
-_G.PFX=_G.PFX or {}
-_G.PFX.p=game:GetService("Players")
-_G.PFX.lp=_G.PFX.p.LocalPlayer
-_G.PFX.c=_G.PFX.lp.Character or _G.PFX.lp.CharacterAdded:Wait()
-_G.PFX.hrp=_G.PFX.c:WaitForChild("HumanoidRootPart")
-
--- Create holder part
-_G.PFX.f=Instance.new("Part")
-_G.PFX.f.Name="PERFECT_PARTICLE_CLONE"
-_G.PFX.f.Anchored=true
-_G.PFX.f.CanCollide=false
-_G.PFX.f.CanQuery=false
-_G.PFX.f.CanTouch=false
-_G.PFX.f.Transparency=1
-_G.PFX.f.Size=Vector3.new(1,1,1)
-_G.PFX.f.CFrame=_G.PFX.hrp.CFrame*CFrame.new(0,0,-3)
-_G.PFX.f.Parent=workspace
-
--- Storage tables
-_G.PFX.att={}
-_G.PFX.emit={}
-
--- Emitter 1: Back
-_G.PFX.att[1]=Instance.new('Attachment')
-_G.PFX.att[1].Name="Back1"
-_G.PFX.att[1].Axis=Vector3.new(0.90689253807067871,0.33916854858398438,-0.25002115964889526)
-_G.PFX.att[1].CFrame=CFrame.new(5,-4.0000004768371582,0,0.90689253807067871,-0.33324140310287476,0.25786828994750977,0.33916854858398438,0.94045579433441162,0.022528477013111115,-0.25002115964889526,0.067029908299446106,0.96591734886169434)
-_G.PFX.att[1].Orientation=Vector3.new(-1.2908958196640015,14.947492599487305,19.83146858215332)
-_G.PFX.att[1].Position=Vector3.new(5,-4.0000004768371582,0)
-_G.PFX.att[1].Rotation=Vector3.new(-1.3360902070999146,14.943612098693848,20.176063537597656)
-_G.PFX.att[1].SecondaryAxis=Vector3.new(-0.33324140310287476,0.94045579433441162,0.067029908299446106)
-_G.PFX.att[1].Visible=false
-_G.PFX.att[1].Parent=_G.PFX.f
-
-_G.PFX.emit[1]=Instance.new('ParticleEmitter')
-_G.PFX.emit[1].Name="Back"
-_G.PFX.emit[1].Brightness=1
-_G.PFX.emit[1].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(1,1,1)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))})
-_G.PFX.emit[1].LightEmission=0
-_G.PFX.emit[1].LightInfluence=1
-_G.PFX.emit[1].Orientation=Enum.ParticleOrientation.VelocityPerpendicular
-_G.PFX.emit[1].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,11,0),NumberSequenceKeypoint.new(1,11,0)})
-_G.PFX.emit[1].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,-1,0)})
-_G.PFX.emit[1].Texture="rbxassetid://16144044303"
-_G.PFX.emit[1].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0.75,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[1].ZOffset=0
-_G.PFX.emit[1].EmissionDirection=Enum.NormalId.Left
-_G.PFX.emit[1].Enabled=false
-_G.PFX.emit[1].Lifetime=NumberRange.new(2,2)
-_G.PFX.emit[1].Rate=20
-_G.PFX.emit[1].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[1].Rotation=NumberRange.new(0,0)
-_G.PFX.emit[1].Speed=NumberRange.new(0.0099999997764825821,0.0099999997764825821)
-_G.PFX.emit[1].SpreadAngle=Vector2.new(0,0)
-_G.PFX.emit[1].TimeScale=1
-_G.PFX.emit[1].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[1].Drag=0
-_G.PFX.emit[1].VelocityInheritance=0
-_G.PFX.emit[1].WindAffectsDrag=false
-_G.PFX.emit[1].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[1].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[1].ShapePartial=1
-_G.PFX.emit[1].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[1].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[1].FlipbookLayout=Enum.ParticleFlipbookLayout.Grid4x4
-_G.PFX.emit[1].FlipbookMode=Enum.ParticleFlipbookMode.OneShot
-_G.PFX.emit[1].FlipbookStartRandom=false
-_G.PFX.emit[1].LockedToPart=true
-_G.PFX.emit[1].Parent=_G.PFX.att[1]
-_G.PFX.emit[1]:Emit(15)
-
-game:GetService('Debris'):AddItem(_G.PFX.f,20)
-task.delay(20,function() _G.PFX={} end)
-
-print('════════════════════════════════')
-print('PERFECT PARTICLE CLONE CREATED')
-print('Cloned: 1 emitters')
-print('Total Properties: 39')
-print('Emit amount: 15 particles per emitter')
-print('Location: 3 studs in front of you')
-print('Part Name: PERFECT_PARTICLE_CLONE')
-print('════════════════════════════════')
--- PERFECT PARTICLE CLONE SCRIPT - ZERO LOCAL VARIABLES
-_G.PFX=_G.PFX or {}
-_G.PFX.p=game:GetService("Players")
-_G.PFX.lp=_G.PFX.p.LocalPlayer
-_G.PFX.c=_G.PFX.lp.Character or _G.PFX.lp.CharacterAdded:Wait()
-_G.PFX.hrp=_G.PFX.c:WaitForChild("HumanoidRootPart")
-
--- Create holder part
-_G.PFX.f=Instance.new("Part")
-_G.PFX.f.Name="PERFECT_PARTICLE_CLONE"
-_G.PFX.f.Anchored=true
-_G.PFX.f.CanCollide=false
-_G.PFX.f.CanQuery=false
-_G.PFX.f.CanTouch=false
-_G.PFX.f.Transparency=1
-_G.PFX.f.Size=Vector3.new(1,1,1)
-_G.PFX.f.CFrame=_G.PFX.hrp.CFrame*CFrame.new(0,0,-3)
-_G.PFX.f.Parent=workspace
-
--- Storage tables
-_G.PFX.att={}
-_G.PFX.emit={}
-
--- Emitter 1: Back
-_G.PFX.att[1]=Instance.new('Attachment')
-_G.PFX.att[1].Name="Back2"
-_G.PFX.att[1].Axis=Vector3.new(0.90767377614974976,-0.33038121461868286,0.25879833102226257)
-_G.PFX.att[1].CFrame=CFrame.new(-5,-4,0,0.90767377614974976,0.34203124046325684,-0.24319322407245636,-0.33038121461868286,0.93968856334686279,0.088507793843746185,0.25879833102226257,1.027264806907624e-05,0.96593135595321655)
-_G.PFX.att[1].Orientation=Vector3.new(-5.0777673721313477,-14.131689071655273,-19.370952606201172)
-_G.PFX.att[1].Position=Vector3.new(-5,-4,0)
-_G.PFX.att[1].Rotation=Vector3.new(-5.2353634834289551,-14.07508373260498,-20.647499084472656)
-_G.PFX.att[1].SecondaryAxis=Vector3.new(0.34203124046325684,0.93968856334686279,1.027264806907624e-05)
-_G.PFX.att[1].Visible=false
-_G.PFX.att[1].Parent=_G.PFX.f
-
-_G.PFX.emit[1]=Instance.new('ParticleEmitter')
-_G.PFX.emit[1].Name="Back"
-_G.PFX.emit[1].Brightness=1
-_G.PFX.emit[1].Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.new(1,1,1)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))})
-_G.PFX.emit[1].LightEmission=0
-_G.PFX.emit[1].LightInfluence=1
-_G.PFX.emit[1].Orientation=Enum.ParticleOrientation.VelocityPerpendicular
-_G.PFX.emit[1].Size=NumberSequence.new({NumberSequenceKeypoint.new(0,11,0),NumberSequenceKeypoint.new(1,11,0)})
-_G.PFX.emit[1].Squash=NumberSequence.new({NumberSequenceKeypoint.new(0,0,0),NumberSequenceKeypoint.new(1,-1,0)})
-_G.PFX.emit[1].Texture="rbxassetid://16144044303"
-_G.PFX.emit[1].Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0.75,0),NumberSequenceKeypoint.new(1,1,0)})
-_G.PFX.emit[1].ZOffset=0
-_G.PFX.emit[1].EmissionDirection=Enum.NormalId.Left
-_G.PFX.emit[1].Enabled=false
-_G.PFX.emit[1].Lifetime=NumberRange.new(2,2)
-_G.PFX.emit[1].Rate=20
-_G.PFX.emit[1].RotSpeed=NumberRange.new(0,0)
-_G.PFX.emit[1].Rotation=NumberRange.new(0,0)
-_G.PFX.emit[1].Speed=NumberRange.new(0.0099999997764825821,0.0099999997764825821)
-_G.PFX.emit[1].SpreadAngle=Vector2.new(0,0)
-_G.PFX.emit[1].TimeScale=1
-_G.PFX.emit[1].Acceleration=Vector3.new(0,0,0)
-_G.PFX.emit[1].Drag=0
-_G.PFX.emit[1].VelocityInheritance=0
-_G.PFX.emit[1].WindAffectsDrag=false
-_G.PFX.emit[1].Shape=Enum.ParticleEmitterShape.Box
-_G.PFX.emit[1].ShapeInOut=Enum.ParticleEmitterShapeInOut.Outward
-_G.PFX.emit[1].ShapePartial=1
-_G.PFX.emit[1].ShapeStyle=Enum.ParticleEmitterShapeStyle.Volume
-_G.PFX.emit[1].FlipbookFramerate=NumberRange.new(1,1)
-_G.PFX.emit[1].FlipbookLayout=Enum.ParticleFlipbookLayout.Grid4x4
-_G.PFX.emit[1].FlipbookMode=Enum.ParticleFlipbookMode.OneShot
-_G.PFX.emit[1].FlipbookStartRandom=false
-_G.PFX.emit[1].LockedToPart=true
-_G.PFX.emit[1].Parent=_G.PFX.att[1]
-_G.PFX.emit[1]:Emit(15)
-
-game:GetService('Debris'):AddItem(_G.PFX.f,20)
-task.delay(20,function() _G.PFX={} end)
-
+BlackFlashHit(LocalPlayer.Character, LocalPlayer.Character)
