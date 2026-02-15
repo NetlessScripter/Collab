@@ -1,4 +1,37 @@
 local Debris = game:GetService("Debris")
+
+local function SFX(path, vol, parent, tpos)
+	local name = path:match("([^/]+)%?") or path:match("([^/]+)$")
+	local file = name .. ".mp3"
+
+	if not isfile(file) then
+		writefile(file, game:HttpGet(path))
+	end
+
+	local s = Instance.new("Sound")
+	s.Name = name
+	s.SoundId = (getcustomasset or getsynasset)(file)
+	s.Volume = vol or 1
+	s.TimePosition = tpos or 0
+	s.Parent = parent or workspace
+	s:Play()
+	Debris:AddItem(s, 5)
+	return s
+end
+
+local function RBXSFX(id, vol, par, tpos)
+	local s = Instance.new("Sound")
+	local str = tostring(id)
+	s.Name = str:match("%d+") or "RBXSound"
+	s.SoundId = str:match("rbxassetid://") and str or "rbxassetid://" .. str
+	s.Volume = vol or 1
+	s.TimePosition = tpos or 0
+	s.Parent = par or workspace
+	s:Play()
+	Debris:AddItem(s, 5)
+	return s
+end
+
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = game.Players.LocalPlayer
 
@@ -25,7 +58,8 @@ local function BlackFlashHit(attacker, victim)
 	effectPart.Position = victimHRP.Position
 	effectPart.Parent = workspace.Effects
 	Debris:AddItem(effectPart, 1)
-	
+       SFX("https://github.com/NetlessScripter/Vegeta/blob/f69548941b7da7cea3406fe52ff642e18fb1ebc8/copy_3045D33D-79BC-4E7A-AAD4-683BEC38379B.mp3?raw=true", 1.65, HRP, 0)
+
 	local pointLight = Instance.new("PointLight", effectPart)
 	pointLight.Brightness = 10
 	pointLight.Color = Color3.fromRGB(255, 0, 0)
@@ -236,5 +270,5 @@ local function BlackFlashHit(attacker, victim)
 		colorCorrection:Destroy()
 	end
 end
-
+wait(.5)
 BlackFlashHit(LocalPlayer.Character, LocalPlayer.Character)
