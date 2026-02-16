@@ -413,7 +413,7 @@ local function CSP(character)
 	PFX.emit[1].EmissionDirection=Enum.NormalId.Top
 	PFX.emit[1].Enabled=false
 	PFX.emit[1].Lifetime=NumberRange.new(0.15000000596046448,0.15000000596046448)
-	PFX.emit[1].Rate=1
+	PFX.emit[1].Rate=0
 	PFX.emit[1].RotSpeed=NumberRange.new(0,0)
 	PFX.emit[1].Rotation=NumberRange.new(0,0)
 	PFX.emit[1].Speed=NumberRange.new(0,0)
