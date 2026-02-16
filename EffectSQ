@@ -311,12 +311,6 @@ local CurrentShaker = CameraShaker.new(Enum.RenderPriority.Camera.Value, functio
 	workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame * shakeCFrame
 end)
 CurrentShaker:Start()
-CurrentShaker:Shake(Presets.HeavyHit())
-CurrentShaker:Shake(Presets.MediumHit())
-CurrentShaker:Shake(Presets.LightHit())
-CurrentShaker:Shake(Presets.Snap())
-CurrentShaker:Shake(Presets.ViolentBump())
-]]
 local Debris = game:GetService("Debris")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -916,7 +910,8 @@ local function BFH(attacker, victim)
 		lightning:Emit(6)
 		wind:Emit(7)
 	end)
-	if player.Character == attacker or player.Character == victim then
+	local player = game.Players.LocalPlayer
+	if player and player.Character and (player.Character == attacker or player.Character == victim) then
 		local colorCorrection = Instance.new("ColorCorrectionEffect")
 		colorCorrection.Name = "BlackFlashCC"
 		colorCorrection.Brightness = -200
