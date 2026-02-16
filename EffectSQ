@@ -1,4 +1,357 @@
--- NEVER ADD ANY COMMENTS
+local CameraShakeState = {
+	FadingIn = 0,
+	FadingOut = 1,
+	Sustained = 2,
+	Inactive = 3
+}
+
+local function newCameraShakeInstance(magnitude, roughness, fadeInTime, fadeOutTime)
+	fadeInTime = fadeInTime or 0
+	fadeOutTime = fadeOutTime or 0
+	
+	assert(type(magnitude) == "number", "Magnitude must be a number")
+	assert(type(roughness) == "number", "Roughness must be a number")
+	assert(type(fadeInTime) == "number", "FadeInTime must be a number")
+	assert(type(fadeOutTime) == "number", "FadeOutTime must be a number")
+	
+	local instance = {}
+	instance.Magnitude = magnitude
+	instance.Roughness = roughness
+	instance.PositionInfluence = Vector3.new()
+	instance.RotationInfluence = Vector3.new()
+	instance.DeleteOnInactive = true
+	instance.roughMod = 1
+	instance.magnMod = 1
+	instance.fadeOutDuration = fadeOutTime
+	instance.fadeInDuration = fadeInTime
+	instance.sustain = (fadeInTime > 0)
+	instance.currentFadeTime = (fadeInTime > 0) and 0 or 1
+	instance.tick = Random.new():NextNumber(-100, 100)
+	
+	function instance:UpdateShake(deltaTime)
+		local tick = self.tick
+		local fadeTime = self.currentFadeTime
+		
+		if self.fadeInDuration > 0 and self.sustain then
+			if fadeTime < 1 then
+				fadeTime = fadeTime + deltaTime / self.fadeInDuration
+			elseif self.fadeOutDuration > 0 then
+				self.sustain = false
+			end
+		end
+		
+		if not self.sustain then
+			fadeTime = fadeTime - deltaTime / self.fadeOutDuration
+		end
+		
+		if self.sustain then
+			self.tick = tick + deltaTime * self.Roughness * self.roughMod
+		else
+			self.tick = tick + deltaTime * self.Roughness * self.roughMod * fadeTime
+		end
+		
+		self.currentFadeTime = fadeTime
+		
+		return Vector3.new(
+			math.noise(tick, 0) * 0.5,
+			math.noise(0, tick) * 0.5,
+			math.noise(tick, tick) * 0.5
+		) * self.Magnitude * self.magnMod * fadeTime
+	end
+	
+	function instance:StartFadeOut(fadeOutTime)
+		if fadeOutTime == 0 then
+			self.currentFadeTime = 0
+		end
+		self.fadeOutDuration = fadeOutTime
+		self.fadeInDuration = 0
+		self.sustain = false
+	end
+	
+	function instance:StartFadeIn(fadeInTime)
+		if fadeInTime == 0 then
+			self.currentFadeTime = 1
+		end
+		fadeInTime = fadeInTime or self.fadeInDuration
+		self.fadeInDuration = fadeInTime
+		self.fadeOutDuration = 0
+		self.sustain = true
+	end
+	
+	function instance:GetScaleRoughness()
+		return self.roughMod
+	end
+	
+	function instance:SetScaleRoughness(mod)
+		self.roughMod = mod
+	end
+	
+	function instance:GetScaleMagnitude()
+		return self.magnMod
+	end
+	
+	function instance:SetScaleMagnitude(mod)
+		self.magnMod = mod
+	end
+	
+	function instance:GetNormalizedFadeTime()
+		return self.currentFadeTime
+	end
+	
+	function instance:IsShaking()
+		return self.currentFadeTime > 0 or self.sustain
+	end
+	
+	function instance:IsFadingOut()
+		return (not self.sustain) and self.currentFadeTime > 0
+	end
+	
+	function instance:IsFadingIn()
+		return self.currentFadeTime < 1 and self.sustain and self.fadeInDuration > 0
+	end
+	
+	function instance:GetState()
+		if self:IsFadingIn() then
+			return CameraShakeState.FadingIn
+		elseif self:IsFadingOut() then
+			return CameraShakeState.FadingOut
+		elseif self:IsShaking() then
+			return CameraShakeState.Sustained
+		else
+			return CameraShakeState.Inactive
+		end
+	end
+	
+	return instance
+end
+
+local Presets = {
+	LightHit = function()
+		local shake = newCameraShakeInstance(4, 7, 0.1, 0.75)
+		shake.PositionInfluence = Vector3.new(0.25, 0.25, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	MediumHit = function()
+		local shake = newCameraShakeInstance(6, 9.5, 0.1, 0.85)
+		shake.PositionInfluence = Vector3.new(0.325, 0.325, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	HeavyHit = function()
+		local shake = newCameraShakeInstance(8, 14, 0, 1.25)
+		shake.PositionInfluence = Vector3.new(0.5, 0.5, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	Snap = function()
+		local shake = newCameraShakeInstance(8, 25, 0, 0.7)
+		shake.PositionInfluence = Vector3.new(0.6, 0.6, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	SnapOh = function()
+		local shake = newCameraShakeInstance(8, 25, 0, 1.4)
+		shake.PositionInfluence = Vector3.new(0.6, 0.6, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	LightLoop = function()
+		local shake = newCameraShakeInstance(7, 7, 0.04, 0.04)
+		shake.PositionInfluence = Vector3.new(0.1, 0.1, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	HeavyLoop = function()
+		local shake = newCameraShakeInstance(7, 12, 0.03, 0.03)
+		shake.PositionInfluence = Vector3.new(0.3, 0.3, 0)
+		shake.RotationInfluence = Vector3.new(0, 0, 0)
+		return shake
+	end,
+	
+	SmallBump = function()
+		local shake = newCameraShakeInstance(2.5, 4, 0.1, 0.75)
+		shake.PositionInfluence = Vector3.new(0.01, 0.01, 0.01)
+		shake.RotationInfluence = Vector3.new(0.25, 0.25, 0.25)
+		return shake
+	end,
+	
+	QuickBumpSmall = function()
+		local shake = newCameraShakeInstance(4, 14, 0, 0.3)
+		shake.PositionInfluence = Vector3.new(0.12, 0.18, 0.12)
+		shake.RotationInfluence = Vector3.new(1.2, 1.2, 1.2)
+		return shake
+	end,
+	
+	ViolentBump = function()
+		local shake = newCameraShakeInstance(4.5, 13.5, 0.1, 0.35)
+		shake.PositionInfluence = Vector3.new(0.3, 0.3, 0.3)
+		shake.RotationInfluence = Vector3.new(1.4, 1.4, 1.4)
+		return shake
+	end
+}
+
+local CameraShaker = {}
+
+function CameraShaker.new(renderPriority, callback)
+	assert(type(renderPriority) == "number", "RenderPriority must be a number (e.g.: Enum.RenderPriority.Camera.Value)")
+	assert(type(callback) == "function", "Callback must be a function")
+	
+	local shaker = {}
+	shaker._running = false
+	shaker._renderName = "CameraShaker"
+	shaker._renderPriority = renderPriority
+	shaker._camShakeInstances = {}
+	shaker._removeInstances = {}
+	shaker._callback = callback
+	
+	function shaker:Start()
+		if not self._running then
+			self._running = true
+			local callback = self._callback
+			game:GetService("RunService"):BindToRenderStep(self._renderName, self._renderPriority, function(deltaTime)
+				debug.profilebegin("CameraShakerUpdate")
+				debug.profileend()
+				callback(self:Update(deltaTime))
+			end)
+		end
+	end
+	
+	function shaker:Stop()
+		if self._running then
+			game:GetService("RunService"):UnbindFromRenderStep(self._renderName)
+			self._running = false
+		end
+	end
+	
+	function shaker:StopSustained(fadeOutTime)
+		for _, instance in pairs(self._camShakeInstances) do
+			if instance.fadeOutDuration == 0 then
+				instance:StartFadeOut(fadeOutTime or instance.fadeInDuration)
+			end
+		end
+	end
+	
+	function shaker:Update(deltaTime)
+		local instances = self._camShakeInstances
+		local posAddShake = Vector3.new()
+		local rotAddShake = Vector3.new()
+		
+		for i = 1, #instances do
+			local instance = instances[i]
+			local state = instance:GetState()
+			
+			if state == CameraShakeState.Inactive and instance.DeleteOnInactive then
+				table.insert(self._removeInstances, i)
+			elseif state ~= CameraShakeState.Inactive then
+				local shakeOffset = instance:UpdateShake(deltaTime)
+				posAddShake = posAddShake + shakeOffset * instance.PositionInfluence
+				rotAddShake = rotAddShake + shakeOffset * instance.RotationInfluence
+			end
+		end
+		
+		for i = #self._removeInstances, 1, -1 do
+			table.remove(instances, self._removeInstances[i])
+			self._removeInstances[i] = nil
+		end
+		
+		return CFrame.new(posAddShake) 
+			* CFrame.Angles(0, math.rad(rotAddShake.Y), 0) 
+			* CFrame.Angles(math.rad(rotAddShake.X), 0, math.rad(rotAddShake.Z))
+	end
+	
+	function shaker:Shake(shakeInstance)
+		if not _G.Settings or not _G.Settings.ScreenShake then
+			if not _G.Settings then
+				_G.Settings = {ScreenShake = true}
+			end
+		end
+		
+		if not _G.Settings.ScreenShake then
+			return {StartFadeOut = function() end, StartFadeIn = function() end}
+		end
+		
+		assert(type(shakeInstance) == "table", "ShakeInstance must be a CameraShakeInstance")
+		table.insert(self._camShakeInstances, shakeInstance)
+		return shakeInstance
+	end
+	
+	function shaker:ShakeSustain(shakeInstance)
+		if not _G.Settings or not _G.Settings.ScreenShake then
+			if not _G.Settings then
+				_G.Settings = {ScreenShake = true}
+			end
+		end
+		
+		if not _G.Settings.ScreenShake then
+			return {StartFadeOut = function() end, StartFadeIn = function() end}
+		end
+		
+		assert(type(shakeInstance) == "table", "ShakeInstance must be a CameraShakeInstance")
+		table.insert(self._camShakeInstances, shakeInstance)
+		shakeInstance:StartFadeIn(shakeInstance.fadeInDuration)
+		return shakeInstance
+	end
+	
+	function shaker:ShakeOnce(preset, magnitude, roughness, fadeInTime, posInfluence, rotInfluence)
+		if not _G.Settings or not _G.Settings.ScreenShake then
+			if not _G.Settings then
+				_G.Settings = {ScreenShake = true}
+			end
+		end
+		
+		if not _G.Settings.ScreenShake then
+			return {StartFadeOut = function() end, StartFadeIn = function() end}
+		end
+		
+		local instance = newCameraShakeInstance(magnitude, roughness, fadeInTime)
+		instance.PositionInfluence = (typeof(posInfluence) == "Vector3") and posInfluence or Vector3.new(0.15, 0.15, 0.15)
+		instance.RotationInfluence = (typeof(rotInfluence) == "Vector3") and rotInfluence or Vector3.new(1, 1, 1)
+		table.insert(self._camShakeInstances, instance)
+		return instance
+	end
+	
+	function shaker:StartShake(preset, magnitude, roughness, posInfluence, rotInfluence)
+		if not _G.Settings or not _G.Settings.ScreenShake then
+			if not _G.Settings then
+				_G.Settings = {ScreenShake = true}
+			end
+		end
+		
+		if not _G.Settings.ScreenShake then
+			return {StartFadeOut = function() end, StartFadeIn = function() end}
+		end
+		
+		local instance = newCameraShakeInstance(magnitude, roughness)
+		instance.PositionInfluence = (typeof(posInfluence) == "Vector3") and posInfluence or Vector3.new(0.15, 0.15, 0.15)
+		instance.RotationInfluence = (typeof(rotInfluence) == "Vector3") and rotInfluence or Vector3.new(1, 1, 1)
+		instance:StartFadeIn(roughness)
+		table.insert(self._camShakeInstances, instance)
+		return instance
+	end
+	
+	return shaker
+end
+
+local CurrentShaker = CameraShaker.new(Enum.RenderPriority.Camera.Value, function(shakeCFrame)
+	workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame * shakeCFrame
+end)
+CurrentShaker:Start()
+
+--[[
+CurrentShaker:Shake(Presets.HeavyHit())
+CurrentShaker:Shake(Presets.MediumHit())
+CurrentShaker:Shake(Presets.LightHit())
+CurrentShaker:Shake(Presets.Snap())
+CurrentShaker:Shake(Presets.ViolentBump())
+]]
+
 -- NEVER MAKE DUPLICATE VARIABLES (variables that already exist)
 local Debris = game:GetService("Debris")
 local TweenService = game:GetService("TweenService")
@@ -788,6 +1141,7 @@ humanoid.AnimationPlayed:Connect(function(animationTrack)
 		CAP()
 		
 		wait(0.5)
+CurrentShaker:Shake(Presets.HeavyHit())
 		Swing()
 		BFH(player.Character, player.Character)
 	end
