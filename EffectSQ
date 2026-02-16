@@ -360,6 +360,9 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
+-- Cache for sound instances to prevent duplicate sounds
+local SoundCache = {}
+
 local function SFX(path, vol, parent, tpos)
 	local name = path:match("([^/]+)%?") or path:match("([^/]+)$")
 	local file = name .. ".mp3"
@@ -368,6 +371,17 @@ local function SFX(path, vol, parent, tpos)
 		writefile(file, game:HttpGet(path))
 	end
 
+	-- Check if sound is already cached
+	if SoundCache[name] then
+		local cachedSound = SoundCache[name]
+		-- Just reset the sound and replay it
+		cachedSound.TimePosition = tpos or 0
+		cachedSound.Volume = vol or 1
+		cachedSound:Play()
+		return cachedSound
+	end
+
+	-- Create new sound if not cached
 	local s = Instance.new("Sound")
 	s.Name = name
 	s.SoundId = (getcustomasset or getsynasset)(file)
@@ -375,6 +389,10 @@ local function SFX(path, vol, parent, tpos)
 	s.TimePosition = tpos or 0
 	s.Parent = parent or workspace
 	s.Looped = false
+	
+	-- Cache the sound instance
+	SoundCache[name] = s
+	
 	s:Play()
 	return s
 end
