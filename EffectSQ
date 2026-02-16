@@ -729,7 +729,7 @@ local function BFH(attacker, victim)
 	effectPart.Position = victimHRP.Position
 	effectPart.Parent = workspace.Effects
 	Debris:AddItem(effectPart, 1)
-	SFX("https://raw.githubusercontent.com/NetlessScripter/Collab/refs/heads/main/C5BE36FC-89B0-40B7-A70F-3E35F8D3D0E80216_000231.mp3?raw=true", 1.65, workspace, 0)
+	SFX("https://raw.githubusercontent.com/NetlessScripter/Collab/refs/heads/main/C5BE36FC-89B0-40B7-A70F-3E35F8D3D0E80216_000231.mp3?raw=true", 1.65, workspace, 0.11)
 	local pointLight = Instance.new("PointLight", effectPart)
 	pointLight.Brightness = 10
 	pointLight.Color = Color3.fromRGB(255, 0, 0)
