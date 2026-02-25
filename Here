@@ -1,0 +1,82 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local ZaWarudo = ReplicatedStorage:WaitForChild("Events")
+local GiornoPizza = ReplicatedStorage:WaitForChild("Animations")
+
+local YouShallNotPass = {}
+local NormalSpeedRequiem = {}
+
+local HAMON_BLOCK_SPEED = 0.5
+
+local function ThisManIsBlocking(character)
+	local blocking = Instance.new("BoolValue")
+	blocking.Name = "Blocking"
+	blocking.Parent = character
+end
+
+local function NaniNaniNani(character)
+	local blocking = character:FindFirstChild("Blocking")
+	if blocking then
+		blocking:Destroy()
+	end
+end
+
+local function OmaeWaMouShindeiru(player, character, humanoid)
+	NaniNaniNani(character)
+
+	if YouShallNotPass[player] then
+		YouShallNotPass[player]:Stop(0.2)
+		YouShallNotPass[player] = nil
+	end
+
+	if NormalSpeedRequiem[player] then
+		humanoid.WalkSpeed = NormalSpeedRequiem[player]
+		NormalSpeedRequiem[player] = nil
+	end
+end
+
+ZaWarudo:WaitForChild("Block").OnServerEvent:Connect(function(Giorno, isBlocking)
+	local ThisIsRequiem = Giorno.Character
+	if not ThisIsRequiem then return end
+
+	local Hierophant = ThisIsRequiem:FindFirstChild("Humanoid")
+	if not Hierophant or Hierophant.Health <= 0 then return end
+
+	local DioAnimator = Hierophant:FindFirstChildOfClass("Animator")
+	if not DioAnimator then return end
+
+	if isBlocking then
+		if not ThisIsRequiem:FindFirstChild("Blocking") then
+			ThisManIsBlocking(ThisIsRequiem)
+
+			local BlockOrDie = GiornoPizza:FindFirstChild("Block")
+			if not BlockOrDie then
+				warn("Muda! Block animation not found!")
+				return
+			end
+
+			local YouCantHitMe = DioAnimator:LoadAnimation(BlockOrDie)
+			YouCantHitMe:Play(0.15)
+			YouShallNotPass[Giorno] = YouCantHitMe
+
+			NormalSpeedRequiem[Giorno] = Hierophant.WalkSpeed
+			Hierophant.WalkSpeed = Hierophant.WalkSpeed * HAMON_BLOCK_SPEED
+		end
+	else
+		OmaeWaMouShindeiru(Giorno, ThisIsRequiem, Hierophant)
+	end
+end)
+
+Players.PlayerAdded:Connect(function(Giorno)
+	Giorno.CharacterRemoving:Connect(function(ThisIsRequiem)
+		local Hierophant = ThisIsRequiem:FindFirstChild("Humanoid")
+		if Hierophant then
+			OmaeWaMouShindeiru(Giorno, ThisIsRequiem, Hierophant)
+		end
+	end)
+end)
+
+Players.PlayerRemoving:Connect(function(Giorno)
+	YouShallNotPass[Giorno] = nil
+	NormalSpeedRequiem[Giorno] = nil
+end)
